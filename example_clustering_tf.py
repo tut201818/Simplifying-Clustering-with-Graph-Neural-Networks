@@ -11,10 +11,11 @@ from tensorflow.keras.models import Model
 
 from spektral.utils.sparse import sp_matrix_to_sp_tensor
 #from spektral.datasets import Citation, DBLP
-from spektral.datasets import Citation
+from spektral.datasets import Citation#
 from spektral.utils.convolution import normalized_laplacian
 from spektral.layers import GCNConv
-from spektral.layers.pooling import JustBalancePool
+#from spektral.layers.pooling import JustBalancePool
+from spektral.layers import JustBalancePool#
 
 from eval_metrics import eval_metrics
 
