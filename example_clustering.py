@@ -15,7 +15,7 @@ torch.manual_seed(1) # for (inconsistent) reproducibility
 torch.cuda.manual_seed(1)
 
 # Load dataset
-dataset = 'cora' #'cora', 'citeseer' or 'pubmed'
+dataset = 'pubmed' #'cora', 'citeseer' or 'pubmed'
 path = osp.join(osp.dirname(osp.realpath(__file__)), '.', 'data', dataset)
 dataset = Planetoid(path, dataset, transform=T.NormalizeFeatures())
 data = dataset[0]
