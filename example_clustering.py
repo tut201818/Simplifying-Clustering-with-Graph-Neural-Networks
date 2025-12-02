@@ -88,7 +88,7 @@ def test():
     clust, _ = model(data.x, data.edge_index, data.edge_weight)
     return NMI(clust.max(1)[1].cpu(), data.y.cpu())
     
-for epoch in range(1, 1001):
+for epoch in range(1, 10):#(1,1001)
     train_loss = train()
     nmi = test()
     print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.3f}')
