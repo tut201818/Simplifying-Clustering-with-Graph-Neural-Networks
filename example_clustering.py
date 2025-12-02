@@ -92,3 +92,8 @@ for epoch in range(1, 10):#(1,1001)
     train_loss = train()
     nmi = test()
     print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.3f}')
+
+print(dataset)
+print(x)
+print(s)
+print(nmi)
