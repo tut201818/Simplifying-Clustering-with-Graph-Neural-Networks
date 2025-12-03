@@ -11,6 +11,11 @@ from sklearn.metrics import normalized_mutual_info_score as NMI
 
 from just_balance import just_balance_pool
 
+#
+import numpy as np
+from scipy.optimize import linear_sum_assignment
+
+
 torch.manual_seed(1) # for (inconsistent) reproducibility
 torch.cuda.manual_seed(1)
 
@@ -86,16 +91,28 @@ def train():
 def test():
     model.eval()
     clust, _ = model(data.x, data.edge_index, data.edge_weight)
+    
+    return NMI(clust.max(1)[1].cpu(), data.y.cpu()), ACC(clust.max(1)[1].cpu(), data.y.cpu())#
 
-    print(dataset)#
-    print(clust)#
+def ACC(y_true, y_pred):
+    """
+    クラスタリング ACC を Hungarian Algorithm で計算
+    """
+    y_true = y_true.astype(np.int64)
+    y_pred = y_pred.astype(np.int64)
+    D = max(y_pred.max(), y_true.max()) + 1
+    w = np.zeros((D, D), dtype=int)
+
+    for i in range(y_pred.size):
+        w[y_pred[i], y_true[i]] += 1
+
+    # Hungarian Algorithm
+    row_ind, col_ind = linear_sum_assignment(w.max() - w)
+
+    return sum(w[row, col] for row, col in zip(row_ind, col_ind)) / y_pred.size
+
     
-    return NMI(clust.max(1)[1].cpu(), data.y.cpu())
-    
-for epoch in range(1, 10):#(1,1001)
+for epoch in range(1, 101):#(1,1001)
     train_loss = train()
-    nmi = test()
-    print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.3f}')
-
-
-
+    nmi, acc = test()
+    print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.3f}', ACC: {acc:.3f})
