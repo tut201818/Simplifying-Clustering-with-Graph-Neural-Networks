@@ -92,8 +92,8 @@ def test():
     model.eval()
     clust, _ = model(data.x, data.edge_index, data.edge_weight)
 
-    print(data.y.cpu())
-    print(clust.max(1)[1].cpu())
+    clust_types = len(set(clust.max(1)[1].cpu()))
+    print(clust_types)
     
     return NMI(clust.max(1)[1].cpu(), data.y.cpu()), ACC(clust.max(1)[1].cpu(), data.y.cpu())#
 
