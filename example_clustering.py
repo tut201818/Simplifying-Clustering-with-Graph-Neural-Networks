@@ -98,18 +98,18 @@ def ACC(y_true, y_pred):
     """
     クラスタリング ACC を Hungarian Algorithm で計算
     """
-    y_true = y_true.cpu().numpy().astype(np.int64)
-    y_pred = y_pred.cpu().numpy().astype(np.int64)
-    D = max(y_pred.max(), y_true.max()) + 1
+    true = y_true.cpu().numpy().astype(np.int64)
+    pred = y_pred.cpu().numpy().astype(np.int64)
+    D = max(pred.max(), true.max()) + 1
     w = np.zeros((D, D), dtype=int)
 
-    for i in range(y_pred.size):
-        w[y_pred[i], y_true[i]] += 1
+    for i in range(pred.size):
+        w[pred[i], true[i]] += 1
 
     # Hungarian Algorithm
     row_ind, col_ind = linear_sum_assignment(w.max() - w)
 
-    return sum(w[row, col] for row, col in zip(row_ind, col_ind)) / y_pred.size
+    return sum(w[row, col] for row, col in zip(row_ind, col_ind)) / pred.size
 
     
 for epoch in range(1, 1001):#(1,1001)
