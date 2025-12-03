@@ -92,7 +92,7 @@ def test():
     model.eval()
     clust, _ = model(data.x, data.edge_index, data.edge_weight)
         
-    return NMI(clust.max(1)[1].cpu(), data.y.cpu()), ACC(clust.max(1)[1].cpu(), data.y.cpu())#
+    return NMI(clust.max(1)[1].cpu(), data.y.cpu()), ACC(clust.max(1)[1].cpu(), data.y.cpu()),len(set(clust.max(1)[1].cpu().numpy().astype(np.int64)))
 
 def ACC(y_pred, y_true):
     """
@@ -100,10 +100,6 @@ def ACC(y_pred, y_true):
     """
     pred = y_pred.cpu().numpy().astype(np.int64)
     true = y_true.cpu().numpy().astype(np.int64)
-    
-    print(pred)
-    clust_types = len(set(pred))
-    print(clust_types)
     
     D = max(pred.max(), true.max()) + 1
     w = np.zeros((D, D), dtype=int)
@@ -119,5 +115,5 @@ def ACC(y_pred, y_true):
     
 for epoch in range(1, 1001):#(1,1001)
     train_loss = train()
-    nmi, acc = test()
-    print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.3f},' f'ACC: {acc:.3f}')
+    nmi, acc, clust_types = test()
+    print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.3f},' f'ACC: {acc:.3f}, clust_types: {clust_types:.3f}')
