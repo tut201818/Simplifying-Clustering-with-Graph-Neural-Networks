@@ -112,7 +112,7 @@ def ACC(y_true, y_pred):
     return sum(w[row, col] for row, col in zip(row_ind, col_ind)) / y_pred.size
 
     
-for epoch in range(1, 101):#(1,1001)
+for epoch in range(1, 1001):#(1,1001)
     train_loss = train()
     nmi, acc = test()
     print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.3f},' f'ACC: {acc:.3f}')
