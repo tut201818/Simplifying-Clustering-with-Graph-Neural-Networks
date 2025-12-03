@@ -97,7 +97,7 @@ def test():
     clust_types = len(set(clust.max(1)[1].cpu()))
     print(clust_types)
     print(data.y.cpu())
-    clust_types = len(set((data.y.cpu()))
+    clust_types = len(set(data.y.cpu()))
     print(clust_types)
     
     
