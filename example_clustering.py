@@ -91,16 +91,7 @@ def train():
 def test():
     model.eval()
     clust, _ = model(data.x, data.edge_index, data.edge_weight)
-
-
-    print(clust.max(1)[1].cpu())
-    clust_types = len(set(clust.max(1)[1].cpu()))
-    print(clust_types)
-    print(data.y.cpu())
-    clust_types = len(set(data.y.cpu()))
-    print(clust_types)
-    
-    
+        
     return NMI(clust.max(1)[1].cpu(), data.y.cpu()), ACC(clust.max(1)[1].cpu(), data.y.cpu())#
 
 def ACC(y_true, y_pred):
@@ -109,6 +100,11 @@ def ACC(y_true, y_pred):
     """
     true = y_true.cpu().numpy().astype(np.int64)
     pred = y_pred.cpu().numpy().astype(np.int64)
+    
+    print(pred)
+    clust_types = len(set(pred))
+    print(clust_types)
+    
     D = max(pred.max(), true.max()) + 1
     w = np.zeros((D, D), dtype=int)
 
