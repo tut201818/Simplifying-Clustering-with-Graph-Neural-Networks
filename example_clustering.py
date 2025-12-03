@@ -98,8 +98,8 @@ def ACC(y_true, y_pred):
     """
     クラスタリング ACC を Hungarian Algorithm で計算
     """
-    y_true = y_true.astype(np.int64)
-    y_pred = y_pred.astype(np.int64)
+    y_true = y_true.cpu().numpy().astype(np.int64)
+    y_pred = y_pred.cpu().numpy().astype(np.int64)
     D = max(y_pred.max(), y_true.max()) + 1
     w = np.zeros((D, D), dtype=int)
 
