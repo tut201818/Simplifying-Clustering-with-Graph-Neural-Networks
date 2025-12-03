@@ -91,6 +91,10 @@ def train():
 def test():
     model.eval()
     clust, _ = model(data.x, data.edge_index, data.edge_weight)
+
+    print(100)
+    print(ACC(clust.max(1)[1].cpu(), clust.max(1)[1].cpu()))
+    print(ACC(data.y.cpu(), data.y.cpu()))
     
     return NMI(clust.max(1)[1].cpu(), data.y.cpu()), ACC(clust.max(1)[1].cpu(), data.y.cpu())#
 
