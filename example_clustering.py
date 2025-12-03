@@ -115,4 +115,4 @@ def ACC(y_true, y_pred):
 for epoch in range(1, 101):#(1,1001)
     train_loss = train()
     nmi, acc = test()
-    print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.3f}', ACC: {acc:.3f})
+    print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.3f},' f'ACC: {acc:.3f}')
