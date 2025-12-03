@@ -94,12 +94,12 @@ def test():
         
     return NMI(clust.max(1)[1].cpu(), data.y.cpu()), ACC(clust.max(1)[1].cpu(), data.y.cpu())#
 
-def ACC(y_true, y_pred):
+def ACC(y_pred, y_true):
     """
     クラスタリング ACC を Hungarian Algorithm で計算
     """
-    true = y_true.cpu().numpy().astype(np.int64)
     pred = y_pred.cpu().numpy().astype(np.int64)
+    true = y_true.cpu().numpy().astype(np.int64)
     
     print(pred)
     clust_types = len(set(pred))
