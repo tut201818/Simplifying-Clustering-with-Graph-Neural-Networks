@@ -179,36 +179,6 @@ def ACC(y_pred, y_true):
     return sum(w[row, col] for row, col in zip(row_ind, col_ind)) / pred.size
 
 
-def clustering_scores(y_pred, y_true):
-    """
-    Hungarian Algorithm による ACC と F1 を計算
-    """
-    pred = y_pred.cpu().numpy().astype(np.int64)
-    true = y_true.cpu().numpy().astype(np.int64)
-
-    D = max(pred.max(), true.max()) + 1
-    w = np.zeros((D, D), dtype=int)
-
-    for i in range(pred.size):
-        w[pred[i], true[i]] += 1
-
-    # Hungarian
-    row_ind, col_ind = linear_sum_assignment(w.max() - w)
-
-    # --- ACC ---
-    acc = sum(w[row, col] for row, col in zip(row_ind, col_ind)) / pred.size
-
-    # --- ラベル写像を作る ---
-    label_map = {row: col for row, col in zip(row_ind, col_ind)}
-    pred_aligned = np.vectorize(lambda x: label_map.get(x, x))(pred)
-
-    # --- F1 ---
-    f1_macro = f1_score(true, pred_aligned, average="macro")
-    f1_micro = f1_score(true, pred_aligned, average="micro")
-
-    return acc, f1_macro, f1_micro
-
-
 def clustering_full_scores(y_pred, y_true, edge_index, num_nodes):
     """
     Hungarian ACC + F1 + Modularity + Conductance
@@ -284,7 +254,6 @@ def clustering_full_scores(y_pred, y_true, edge_index, num_nodes):
 
     # -----------------------------
     return {
-        "ACC": acc,
         "F1_macro": f1_macro,
         "F1_micro": f1_micro,
         "Modularity": mod,
@@ -293,7 +262,7 @@ def clustering_full_scores(y_pred, y_true, edge_index, num_nodes):
 
 
     
-for epoch in range(1, 100):#(1,1001)
+for epoch in range(1, 1001):#(1,1001)
     train_loss = train()
     nmi, acc, clust_types = test()
     print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.3f}, ' f'ACC: {acc:.3f}, clust_types: {clust_types:.0f}')
