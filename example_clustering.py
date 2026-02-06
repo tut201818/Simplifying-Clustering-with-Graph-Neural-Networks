@@ -99,14 +99,14 @@ class Net(torch.nn.Module):
         # Cluster assignments (logits)
         s = self.mlp(x)
 
-        if 1:
+        if 0:
           # Compute loss
           adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
           _, _, b_loss = just_balance_pool(x, adj, s)
         
           return torch.softmax(s, dim=-1), b_loss
           
-        if 0:
+        if 1:
           # Compute loss
           adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
           _, _, mc_loss, o_loss = dense_mincut_pool(x, adj, s)
