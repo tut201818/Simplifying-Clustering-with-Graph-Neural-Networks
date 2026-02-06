@@ -114,14 +114,14 @@ class Net(torch.nn.Module):
         # Cluster assignments (logits)
         s = self.mlp(x)
 
-        if 1:
+        if 0:#JBGNN
           # Compute loss
           adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
           _, _, b_loss = just_balance_pool(x, adj, s)
         
           return torch.softmax(s, dim=-1), b_loss
           
-        if 0:
+        if 1:#MinCutPool
           # Compute loss
           adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
           _, _, mc_loss, o_loss = dense_mincut_pool(x, adj, s)
@@ -130,7 +130,7 @@ class Net(torch.nn.Module):
       
           return torch.softmax(s, dim=-1), total_loss
 
-        if 0:
+        if 0:#DMoN
           #DMoNPooling([hidden_channels, hidden_channels], num_nodes) を使ってDMoN法に変更したい
           # Compute loss
           adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
