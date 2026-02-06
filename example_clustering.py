@@ -35,7 +35,7 @@ from sklearn.metrics.cluster import pair_confusion_matrix
 import sys
 
 
-#変更可能性のある個所は、隣接行列の正規化方法、M活性化関数、
+#変更可能性のある個所は、隣接行列の正規化方法、活性化関数、
 #変更する点は、MPレイヤーでGCNを使うかどうか、多層パーセプトロンでどの手法を使うか、
 
 torch.manual_seed(1) # for (inconsistent) reproducibility
