@@ -11,13 +11,16 @@ from sklearn.metrics import normalized_mutual_info_score as NMI
 
 from just_balance import just_balance_pool
 
-#
+#MinCutPoolのコードから移植
+from torch.nn import Linear
+from torch_geometric.nn import GraphConv, dense_mincut_pool
+from torch_geometric.nn.conv.gcn_conv import gcn_norm
+
+#ACCの計算に必要
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 
-#
-from torch_geometric.nn.conv.gcn_conv import gcn_norm
-
+#変更可能性のある個所は、隣接行列の正規化方法、MPレイヤーでGCNを使うかどうか、活性化関数、
 
 torch.manual_seed(1) # for (inconsistent) reproducibility
 torch.cuda.manual_seed(1)
@@ -28,19 +31,20 @@ path = osp.join(osp.dirname(osp.realpath(__file__)), '.', 'data', dataset)
 dataset = Planetoid(path, dataset, transform=T.NormalizeFeatures())
 data = dataset[0]
 
+#隣接行列の正規化にはMinCutPoolで使われる簡素なものを採用
+if(0){
 # Compute connectivity matrix
 #delta = 0.85
 #edge_index, edge_weight = utils.get_laplacian(data.edge_index, data.edge_weight, normalization='sym')
 #L = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
 #A = torch.eye(data.num_nodes) - delta*L
 #data.edge_index, data.edge_weight = utils.dense_to_sparse(A)
-
-######
+}else{
 # Normalized adjacency matrix
 data.edge_index, data.edge_weight = gcn_norm(  
                 data.edge_index, data.edge_weight, data.num_nodes,
                 add_self_loops=False, dtype=data.x.dtype)
-
+}
 
 
 class Net(torch.nn.Module):
@@ -55,12 +59,20 @@ class Net(torch.nn.Module):
         
         mp_act = getattr(torch.nn, mp_act)(inplace=True)
         mlp_act = getattr(torch.nn, mlp_act)(inplace=True)
-        
+
+        #JBGNNのサンプルでは本来、(GCNConv(in_channels, mp_units[0], normalize=False, cached=False), 'x, edge_index, edge_weight -> x')を使用するが、MinCutPoolのサンプルではGrahpConvを使用
         # Message passing layers
-        mp = [
-            (GCNConv(in_channels, mp_units[0], normalize=False, cached=False), 'x, edge_index, edge_weight -> x'),
-            mp_act
-        ]
+        if(1){
+          mp = [
+              (GCNConv(in_channels, mp_units[0], normalize=False, cached=False), 'x, edge_index, edge_weight -> x'),
+              mp_act
+          ]
+        }else{
+          mp = [
+              (GraphConv(in_channels, mp_units[0]), 'x, edge_index, edge_weight -> x'),
+              mp_act
+          ]
+        }
         for i in range(len(mp_units)-1):
             mp.append((GCNConv(mp_units[i], mp_units[i+1], normalize=False, cached=False), 'x, edge_index, edge_weight -> x'))
             mp.append(mp_act)
@@ -86,6 +98,7 @@ class Net(torch.nn.Module):
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 data = data.to(device)
+#MinCutPoolのサンプルでは活性化関数にELUを使用している
 model = Net([64]*10, "ReLU", dataset.num_features, dataset.num_classes, [16], "ReLU").to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
