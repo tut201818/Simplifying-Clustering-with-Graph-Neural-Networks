@@ -32,7 +32,7 @@ from torch_geometric.data import Data
 
 from sklearn.metrics.cluster import pair_confusion_matrix
 
-
+import sys
 
 
 #変更可能性のある個所は、隣接行列の正規化方法、M活性化関数、
@@ -272,3 +272,5 @@ clust, _ = model(data.x, data.edge_index, data.edge_weight)
 f1_score,mod,conductance = clustering_full_scores(clust.max(1)[1].cpu(), data.y.cpu(),data.edge_index, data.num_nodes)
 f1_score = float(f1_score)
 print(f'F1_score: {f1_score:.4f}, Modularity: {mod:.4f}, Conductance: {conductance:.4f}')
+
+sys.exit()
