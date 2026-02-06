@@ -109,7 +109,7 @@ class Net(torch.nn.Module):
         if 0:
           # Compute loss
           adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
-           _, _, mc_loss, o_loss = dense_mincut_pool(x, adj, s)
+          _, _, mc_loss, o_loss = dense_mincut_pool(x, adj, s)
 
           total_loss = mc_loss + o_loss
       
