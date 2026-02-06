@@ -30,6 +30,9 @@ from torch_geometric.utils import to_networkx, to_dense_adj
 
 from torch_geometric.data import Data
 
+from sklearn.metrics.cluster import pair_confusion_matrix
+
+
 
 
 #変更可能性のある個所は、隣接行列の正規化方法、M活性化関数、
@@ -212,9 +215,13 @@ def clustering_full_scores(y_pred, y_true, edge_index, num_nodes):
     # -----------------------------
     # F1
     # -----------------------------
-    f1_macro = f1_score(true, pred_aligned, average="macro")
-    f1_micro = f1_score(true, pred_aligned, average="micro")
+    pcm = pair_confusion_matrix(y_true, y_pred)
+    tn, fp, fn, tp = pcm.ravel()
 
+    precision = tp / (tp + fp + 1e-12)
+    recall    = tp / (tp + fn + 1e-12)
+
+    f1_score = 2 * precision * recall / (precision + recall + 1e-12)
 
     # -----------------------------
     # Modularity
@@ -254,8 +261,7 @@ def clustering_full_scores(y_pred, y_true, edge_index, num_nodes):
 
     # -----------------------------
     return {
-        "F1_macro": f1_macro,
-        "F1_micro": f1_micro,
+        "F1_score": f1_score,
         "Modularity": mod,
         "Conductance": conductance,
     }
