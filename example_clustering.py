@@ -28,6 +28,8 @@ from sklearn.metrics import f1_score
 import networkx as nx
 from torch_geometric.utils import to_networkx, to_dense_adj
 
+from torch_geometric.data import Data
+
 
 
 #変更可能性のある個所は、隣接行列の正規化方法、M活性化関数、
@@ -243,13 +245,11 @@ def clustering_full_scores(y_pred, y_true, edge_index, num_nodes):
     f1_macro = f1_score(true, pred_aligned, average="macro")
     f1_micro = f1_score(true, pred_aligned, average="micro")
 
+
     # -----------------------------
     # Modularity
     # -----------------------------
-    data_like = type("tmp", (), {})()
-    data_like.edge_index = edge_index
-    data_like.num_nodes = num_nodes
-
+    data_like = Data(edge_index=edge_index, num_nodes=num_nodes)
     G = to_networkx(data_like, to_undirected=True)
 
     communities = {}
