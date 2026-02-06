@@ -258,20 +258,20 @@ def clustering_full_scores(y_pred, y_true, edge_index, num_nodes):
     conductance = float(np.mean(cond_scores)) if cond_scores else 0.0
 
     # -----------------------------
-    return {
+    return float(f1_score),mod,conductance
         "F1_score": float(f1_score),
         "Modularity": mod,
         "Conductance": conductance,
-    }
 
 
     
-for epoch in range(1, 1001):#元は(1,1001)
+for epoch in range(1, 10):#元は(1,1001)
     train_loss = train()
     nmi, acc, clust_types = test()
-    print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.3f}, ' f'ACC: {acc:.3f}, clust_types: {clust_types:.0f}')
+    print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.4f}, ' f'ACC: {acc:.4f}, clust_types: {clust_types:.0f}')
 
 
 model.eval()
 clust, _ = model(data.x, data.edge_index, data.edge_weight)
-print(clustering_full_scores(clust.max(1)[1].cpu(), data.y.cpu(),data.edge_index, data.num_nodes))
+f1_score,mod,conductance = clustering_full_scores(clust.max(1)[1].cpu(), data.y.cpu(),data.edge_index, data.num_nodes)
+print(f'F1_score: {float(f1_score:.4f)}, Modularity: {mod:.4f}, Conductance: {conductance:.4f}')
