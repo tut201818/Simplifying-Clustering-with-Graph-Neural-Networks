@@ -16,6 +16,9 @@ from torch.nn import Linear
 from torch_geometric.nn import GraphConv, dense_mincut_pool
 from torch_geometric.nn.conv.gcn_conv import gcn_norm
 
+#DMoN
+from torch_geometric.nn import DMoNPooling
+
 #ACCの計算に必要
 import numpy as np
 from scipy.optimize import linear_sum_assignment
@@ -99,14 +102,14 @@ class Net(torch.nn.Module):
         # Cluster assignments (logits)
         s = self.mlp(x)
 
-        if 0:
+        if 1:
           # Compute loss
           adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
           _, _, b_loss = just_balance_pool(x, adj, s)
         
           return torch.softmax(s, dim=-1), b_loss
           
-        if 1:
+        if 0:
           # Compute loss
           adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
           _, _, mc_loss, o_loss = dense_mincut_pool(x, adj, s)
@@ -114,7 +117,16 @@ class Net(torch.nn.Module):
           total_loss = mc_loss + o_loss
       
           return torch.softmax(s, dim=-1), total_loss
-          
+
+        if 0:
+          #DMoNPooling([hidden_channels, hidden_channels], num_nodes) を使ってDMoN法に変更したい
+          # Compute loss
+          adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
+          _, _, mc_loss, o_loss = dense_mincut_pool(x, adj, s)
+
+          total_loss = mc_loss + o_loss
+      
+          return torch.softmax(s, dim=-1), total_loss
         
 
 
