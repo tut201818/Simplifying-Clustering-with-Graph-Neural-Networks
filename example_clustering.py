@@ -42,7 +42,7 @@ data = dataset[0]
 #data.edge_index, data.edge_weight = utils.dense_to_sparse(A)
 
 # Normalized adjacency matrix
-  data.edge_index, data.edge_weight = gcn_norm(  
+data.edge_index, data.edge_weight = gcn_norm(  
                 data.edge_index, data.edge_weight, data.num_nodes,
                 add_self_loops=False, dtype=data.x.dtype)
 
