@@ -23,6 +23,13 @@ from torch_geometric.nn import DMoNPooling
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 
+from sklearn.metrics import f1_score
+
+import networkx as nx
+from torch_geometric.utils import to_networkx, to_dense_adj
+
+
+
 #変更可能性のある個所は、隣接行列の正規化方法、M活性化関数、
 #変更する点は、MPレイヤーでGCNを使うかどうか、多層パーセプトロンでどの手法を使うか、
 
@@ -169,8 +176,127 @@ def ACC(y_pred, y_true):
 
     return sum(w[row, col] for row, col in zip(row_ind, col_ind)) / pred.size
 
+
+def clustering_scores(y_pred, y_true):
+    """
+    Hungarian Algorithm による ACC と F1 を計算
+    """
+    pred = y_pred.cpu().numpy().astype(np.int64)
+    true = y_true.cpu().numpy().astype(np.int64)
+
+    D = max(pred.max(), true.max()) + 1
+    w = np.zeros((D, D), dtype=int)
+
+    for i in range(pred.size):
+        w[pred[i], true[i]] += 1
+
+    # Hungarian
+    row_ind, col_ind = linear_sum_assignment(w.max() - w)
+
+    # --- ACC ---
+    acc = sum(w[row, col] for row, col in zip(row_ind, col_ind)) / pred.size
+
+    # --- ラベル写像を作る ---
+    label_map = {row: col for row, col in zip(row_ind, col_ind)}
+    pred_aligned = np.vectorize(lambda x: label_map.get(x, x))(pred)
+
+    # --- F1 ---
+    f1_macro = f1_score(true, pred_aligned, average="macro")
+    f1_micro = f1_score(true, pred_aligned, average="micro")
+
+    return acc, f1_macro, f1_micro
+
+
+def clustering_full_scores(y_pred, y_true, edge_index, data.num_nodes):
+    """
+    Hungarian ACC + F1 + Modularity + Conductance
+    """
+
+    # -----------------------------
+    # ラベル整形
+    # -----------------------------
+    pred = y_pred.cpu().numpy().astype(np.int64)
+    true = y_true.cpu().numpy().astype(np.int64)
+
+    # -----------------------------
+    # Hungarian 用行列
+    # -----------------------------
+    D = max(pred.max(), true.max()) + 1
+    w = np.zeros((D, D), dtype=int)
+
+    for i in range(pred.size):
+        w[pred[i], true[i]] += 1
+
+    row_ind, col_ind = linear_sum_assignment(w.max() - w)
+
+    acc = sum(w[row, col] for row, col in zip(row_ind, col_ind)) / pred.size
+
+    # -----------------------------
+    # ラベル整列
+    # -----------------------------
+    label_map = {row: col for row, col in zip(row_ind, col_ind)}
+    pred_aligned = np.vectorize(lambda x: label_map.get(x, x))(pred)
+
+    # -----------------------------
+    # F1
+    # -----------------------------
+    f1_macro = f1_score(true, pred_aligned, average="macro")
+    f1_micro = f1_score(true, pred_aligned, average="micro")
+
+    # -----------------------------
+    # Modularity
+    # -----------------------------
+    data_like = type("tmp", (), {})()
+    data_like.edge_index = edge_index
+    data_like.num_nodes = num_nodes
+
+    G = to_networkx(data_like, to_undirected=True)
+
+    communities = {}
+    for node, c in enumerate(pred_aligned):
+        communities.setdefault(int(c), set()).add(node)
+
+    mod = nx.algorithms.community.quality.modularity(
+        G, list(communities.values())
+    )
+
+    # -----------------------------
+    # Conductance
+    # -----------------------------
+    adj = to_dense_adj(edge_index, max_num_nodes=num_nodes)[0]
+    labels_t = torch.tensor(pred_aligned)
+
+    cond_scores = []
+
+    for c in labels_t.unique():
+        S = (labels_t == c)
+        notS = ~S
+
+        cut = adj[S][:, notS].sum()
+        volS = adj[S].sum()
+        volNotS = adj[notS].sum()
+
+        denom = torch.min(volS, volNotS)
+        if denom > 0:
+            cond_scores.append((cut / denom).item())
+
+    conductance = float(np.mean(cond_scores)) if cond_scores else 0.0
+
+    # -----------------------------
+    return {
+        "ACC": acc,
+        "F1_macro": f1_macro,
+        "F1_micro": f1_micro,
+        "Modularity": mod,
+        "Conductance": conductance,
+    }
+
+
     
 for epoch in range(1, 1001):#(1,1001)
     train_loss = train()
     nmi, acc, clust_types = test()
     print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.3f}, ' f'ACC: {acc:.3f}, clust_types: {clust_types:.0f}')
+
+
+print(clustering_full_scores())
