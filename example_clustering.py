@@ -204,8 +204,6 @@ def clustering_full_scores(y_pred, y_true, edge_index, num_nodes):
 
     row_ind, col_ind = linear_sum_assignment(w.max() - w)
 
-    acc = sum(w[row, col] for row, col in zip(row_ind, col_ind)) / pred.size
-
     # -----------------------------
     # ラベル整列
     # -----------------------------
@@ -268,7 +266,7 @@ def clustering_full_scores(y_pred, y_true, edge_index, num_nodes):
 
 
     
-for epoch in range(1, 1001):#(1,1001)
+for epoch in range(1, 100):#(1,1001)
     train_loss = train()
     nmi, acc, clust_types = test()
     print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.3f}, ' f'ACC: {acc:.3f}, clust_types: {clust_types:.0f}')
