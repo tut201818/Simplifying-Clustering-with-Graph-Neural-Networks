@@ -259,10 +259,6 @@ def clustering_full_scores(y_pred, y_true, edge_index, num_nodes):
 
     # -----------------------------
     return float(f1_score),mod,conductance
-        "F1_score": float(f1_score),
-        "Modularity": mod,
-        "Conductance": conductance,
-
 
     
 for epoch in range(1, 10):#元は(1,1001)
