@@ -15,6 +15,9 @@ from just_balance import just_balance_pool
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 
+#
+from torch_geometric.nn.conv.gcn_conv import gcn_norm
+
 
 torch.manual_seed(1) # for (inconsistent) reproducibility
 torch.cuda.manual_seed(1)
