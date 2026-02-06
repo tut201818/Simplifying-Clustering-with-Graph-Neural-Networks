@@ -261,7 +261,7 @@ def clustering_full_scores(y_pred, y_true, edge_index, num_nodes):
     return float(f1_score),mod,conductance
 
     
-for epoch in range(1, 10):#元は(1,1001)
+for epoch in range(1, 1001):#元は(1,1001)
     train_loss = train()
     nmi, acc, clust_types = test()
     print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.4f}, ' f'ACC: {acc:.4f}, clust_types: {clust_types:.0f}')
