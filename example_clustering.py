@@ -207,7 +207,7 @@ def clustering_scores(y_pred, y_true):
     return acc, f1_macro, f1_micro
 
 
-def clustering_full_scores(y_pred, y_true, edge_index, data.num_nodes):
+def clustering_full_scores(y_pred, y_true, edge_index, num_nodes):
     """
     Hungarian ACC + F1 + Modularity + Conductance
     """
