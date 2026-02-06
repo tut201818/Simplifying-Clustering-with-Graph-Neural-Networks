@@ -33,14 +33,14 @@ dataset = Planetoid(path, dataset, transform=T.NormalizeFeatures())
 data = dataset[0]
 
 #隣接行列の正規化にはMinCutPoolで使われる簡素なものを採用
-if 0:
+
 # Compute connectivity matrix
 #delta = 0.85
 #edge_index, edge_weight = utils.get_laplacian(data.edge_index, data.edge_weight, normalization='sym')
 #L = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
 #A = torch.eye(data.num_nodes) - delta*L
 #data.edge_index, data.edge_weight = utils.dense_to_sparse(A)
-if 1:
+
 # Normalized adjacency matrix
   data.edge_index, data.edge_weight = gcn_norm(  
                 data.edge_index, data.edge_weight, data.num_nodes,
