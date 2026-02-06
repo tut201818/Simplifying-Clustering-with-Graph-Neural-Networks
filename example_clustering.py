@@ -212,6 +212,9 @@ def clustering_full_scores(y_pred, y_true, edge_index, num_nodes):
     Hungarian ACC + F1 + Modularity + Conductance
     """
 
+
+    clust, _ = model(data.x, data.edge_index, data.edge_weight)
+  
     # -----------------------------
     # ラベル整形
     # -----------------------------
