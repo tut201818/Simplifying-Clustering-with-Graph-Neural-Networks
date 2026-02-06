@@ -20,7 +20,8 @@ from torch_geometric.nn.conv.gcn_conv import gcn_norm
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 
-#変更可能性のある個所は、隣接行列の正規化方法、MPレイヤーでGCNを使うかどうか、活性化関数、
+#変更可能性のある個所は、隣接行列の正規化方法、M活性化関数、
+#変更する点は、MPレイヤーでGCNを使うかどうか、多層パーセプトロンでどの手法を使うか、
 
 torch.manual_seed(1) # for (inconsistent) reproducibility
 torch.cuda.manual_seed(1)
@@ -63,22 +64,30 @@ class Net(torch.nn.Module):
         #JBGNNのサンプルでは本来、(GCNConv(in_channels, mp_units[0], normalize=False, cached=False), 'x, edge_index, edge_weight -> x')を使用するが、MinCutPoolのサンプルではGrahpConvを使用
         # Message passing layers
         if(1){
+          #GCNConv
           mp = [
               (GCNConv(in_channels, mp_units[0], normalize=False, cached=False), 'x, edge_index, edge_weight -> x'),
               mp_act
           ]
+          for i in range(len(mp_units)-1):
+            mp.append((GCNConv(mp_units[i], mp_units[i+1], normalize=False, cached=False), 'x, edge_index, edge_weight -> x'))
+            mp.append(mp_act)
+          self.mp = Sequential('x, edge_index, edge_weight', mp)
+          out_chan = mp_units[-1]                   
         }else{
+          #GraphConv
           mp = [
               (GraphConv(in_channels, mp_units[0]), 'x, edge_index, edge_weight -> x'),
               mp_act
           ]
-        }
-        for i in range(len(mp_units)-1):
-            mp.append((GCNConv(mp_units[i], mp_units[i+1], normalize=False, cached=False), 'x, edge_index, edge_weight -> x'))
+          for i in range(len(mp_units)-1):
+            mp.append((GraphConv(mp_units[i], mp_units[i+1]), 'x, edge_index, edge_weight -> x'))
             mp.append(mp_act)
-        self.mp = Sequential('x, edge_index, edge_weight', mp)
-        out_chan = mp_units[-1]
-        
+          self.mp = Sequential('x, edge_index, edge_weight', mp)
+          out_chan = mp_units[-1]
+        }
+
+        #MLP(多層パーセプトロン)を作成する
         self.mlp = MLP([out_chan] + mlp_units + [n_clusters], act=mlp_act, norm=None)
         
     def forward(self, x, edge_index, edge_weight):
@@ -88,12 +97,23 @@ class Net(torch.nn.Module):
         
         # Cluster assignments (logits)
         s = self.mlp(x)
+
+        if(1){
+          # Compute loss
+          adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
+          _, _, b_loss = just_balance_pool(x, adj, s)
         
-        # Compute loss
-        adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
-        _, _, b_loss = just_balance_pool(x, adj, s)
-        
-        return torch.softmax(s, dim=-1), b_loss
+          return torch.softmax(s, dim=-1), b_loss
+        }else{
+          # Compute loss
+          adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
+           _, _, mc_loss, o_loss = dense_mincut_pool(x, adj, s)
+
+          total_loss = mc_loss + o_loss
+      
+          return torch.softmax(s, dim=-1), total_loss
+          
+        }
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
