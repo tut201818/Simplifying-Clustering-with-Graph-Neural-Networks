@@ -115,7 +115,7 @@ class Net(torch.nn.Module):
       
           return torch.softmax(s, dim=-1), total_loss
           
-        }
+        
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
