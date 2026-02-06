@@ -301,4 +301,4 @@ for epoch in range(1, 100):#(1,1001)
 
 model.eval()
 clust, _ = model(data.x, data.edge_index, data.edge_weight)
-print(clustering_full_scores(clust.max(1)[1].cpu(), data.y.cpu(),edge_index, num_nodes))
+print(clustering_full_scores(clust.max(1)[1].cpu(), data.y.cpu(),data.edge_index, data.num_nodes))
