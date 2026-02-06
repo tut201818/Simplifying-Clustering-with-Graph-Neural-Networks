@@ -211,9 +211,6 @@ def clustering_full_scores(y_pred, y_true, edge_index, num_nodes):
     """
     Hungarian ACC + F1 + Modularity + Conductance
     """
-
-
-    clust, _ = model(data.x, data.edge_index, data.edge_weight)
   
     # -----------------------------
     # ラベル整形
@@ -302,4 +299,6 @@ for epoch in range(1, 100):#(1,1001)
     print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.3f}, ' f'ACC: {acc:.3f}, clust_types: {clust_types:.0f}')
 
 
+model.eval()
+clust, _ = model(data.x, data.edge_index, data.edge_weight)
 print(clustering_full_scores(clust.max(1)[1].cpu(), data.y.cpu(),edge_index, num_nodes))
