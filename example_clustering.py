@@ -140,7 +140,7 @@ class Net(torch.nn.Module):
           # Compute loss
           k = 7 #Coraの場合は真のクラスタ数は7,
           #_, _, _, _, mo_loss, co_loss = DMoNPooling(edge_index.tolist(), k)
-          _, _, _, mo_loss, co_loss = DMoNPooling(13264, k)
+          _, _, mo_loss, co_loss = DMoNPooling(13264, k)
 
           total_loss = mo_loss + co_loss
       
