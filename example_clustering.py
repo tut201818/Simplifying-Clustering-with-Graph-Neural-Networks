@@ -76,7 +76,10 @@ class Net(torch.nn.Module):
         mp_act = getattr(torch.nn, mp_act)(inplace=True)
         mlp_act = getattr(torch.nn, mlp_act)(inplace=True)
 
-        #JBGNNのサンプルでは本来、(GCNConv(in_channels, mp_units[0], normalize=False, cached=False), 'x, edge_index, edge_weight -> x')を使用するが、MinCutPoolのサンプルではGrahpConvを使用
+        #JBGNNのサンプルでは本来、(GCNConv(in_channels, mp_units[0], normalize=False, cached=False), 'x, edge_index, edge_weight -> x')を使用するが、
+        #MinCutPoolのサンプルではGrahpConvを使用
+        #DMoNのサンプルでは一層目はGCNConv、２層と３層ではDenseGraphConvを使用
+        
         # Message passing layers
         if 1:
           #GCNConv
@@ -114,7 +117,7 @@ class Net(torch.nn.Module):
         # Cluster assignments (logits)
         s = self.mlp(x)
 
-        if 1:#JBGNN
+        if 0:#JBGNN
           # Compute loss
           adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
           _, _, b_loss = just_balance_pool(x, adj, s)
@@ -130,11 +133,13 @@ class Net(torch.nn.Module):
       
           return torch.softmax(s, dim=-1), total_loss
 
-        if 0:#DMoN
+        if 1:#DMoN
           #DMoNPooling([hidden_channels, hidden_channels], num_nodes) を使ってDMoN法に変更したい
+          #論文では、ドロップアウトは0.5に設定　初期値は0.0
+            
           # Compute loss
-          adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
-          _, _, mc_loss, o_loss = dense_mincut_pool(x, adj, s)
+          k = 7 #Coraの場合は真のクラスタ数は7,
+          _, _, _, _, mo_loss, co_loss = DMoNPooling(edge_index, k)
 
           total_loss = mc_loss + o_loss
       
