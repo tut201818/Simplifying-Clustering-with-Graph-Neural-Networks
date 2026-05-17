@@ -117,7 +117,7 @@ class Net(torch.nn.Module):
         # Cluster assignments (logits)
         s = self.mlp(x)
 
-        if 0:#JBGNN
+        if 1:#JBGNN
           # Compute loss
           adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
           _, _, b_loss = just_balance_pool(x, adj, s)
@@ -133,7 +133,7 @@ class Net(torch.nn.Module):
       
           return torch.softmax(s, dim=-1), total_loss
 
-        if 1:#DMoN
+        if 0:#DMoN
           #DMoNPooling([hidden_channels, hidden_channels], num_nodes) を使ってDMoN法に変更したい
           #論文では、ドロップアウトは0.5に設定　初期値は0.0
             
