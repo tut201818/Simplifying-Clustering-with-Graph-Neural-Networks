@@ -142,7 +142,7 @@ class Net(torch.nn.Module):
           #_, _, _, _, mo_loss, co_loss = DMoNPooling(edge_index.tolist(), k)
           _, _, _, _, mo_loss, co_loss = DMoNPooling(13264, k)
 
-          total_loss = mc_loss + o_loss
+          total_loss = mo_loss + co_loss
       
           return torch.softmax(s, dim=-1), total_loss
         
