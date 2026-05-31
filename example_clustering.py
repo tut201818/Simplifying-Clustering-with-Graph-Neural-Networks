@@ -51,7 +51,7 @@ torch.cuda.manual_seed(1)
 
 dataset = WebKB(
     root='data/WebKB',
-    name='Wisconsin'
+    name='Texas'
 )
 data = dataset[0]
 
