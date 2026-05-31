@@ -49,9 +49,10 @@ torch.cuda.manual_seed(1)
 #dataset = Planetoid(path, dataset, transform=T.NormalizeFeatures())
 #data = dataset[0]
 
+dataName = 'Cornell'
 dataset = WebKB(
     root='data/WebKB',
-    name='Cornell'
+    name= dataName
 )
 data = dataset[0]
 
@@ -296,6 +297,7 @@ clust, _ = model(data.x, data.edge_index, data.edge_weight)
 f1_score,mod,conductance = clustering_full_scores(clust.max(1)[1].cpu(), data.y.cpu(),data.edge_index, data.num_nodes)
 f1_score = float(f1_score)
 print(f'F1_score: {f1_score:.4f}, Modularity: {mod:.4f}, Conductance: {conductance:.4f}')
+print(dataName)
 if jbgnn:
     print("JBGNN")
 if minCut:
