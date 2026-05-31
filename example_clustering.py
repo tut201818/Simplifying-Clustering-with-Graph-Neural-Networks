@@ -51,9 +51,15 @@ torch.cuda.manual_seed(1)
 
 dataset = WebKB(
     root='data/WebKB',
-    name='Texas'
+    name='Cornell'
 )
 data = dataset[0]
+
+#クラスタリング手法
+#JBGNN
+jbgnn = 1
+#MinCutPool
+minCut = 0
 
 
 #隣接行列の正規化には最初はMinCutPoolで使われる簡素なものを採用したが、GCNと相性がいいのは元の方法の方なのではないかとも思ったので変えた
@@ -126,14 +132,14 @@ class Net(torch.nn.Module):
         # Cluster assignments (logits)
         s = self.mlp(x)
 
-        if 1:#JBGNN
+        if jbgnn:#JBGNN
           # Compute loss
           adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
           _, _, b_loss = just_balance_pool(x, adj, s)
         
           return torch.softmax(s, dim=-1), b_loss
           
-        if 0:#MinCutPool
+        if minCut:#MinCutPool
           # Compute loss
           adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
           _, _, mc_loss, o_loss = dense_mincut_pool(x, adj, s)
@@ -287,5 +293,9 @@ clust, _ = model(data.x, data.edge_index, data.edge_weight)
 f1_score,mod,conductance = clustering_full_scores(clust.max(1)[1].cpu(), data.y.cpu(),data.edge_index, data.num_nodes)
 f1_score = float(f1_score)
 print(f'F1_score: {f1_score:.4f}, Modularity: {mod:.4f}, Conductance: {conductance:.4f}')
+if jbgnn:
+    print("JBGNN")
+if minCut:
+    print("MinCutPool")
 
 sys.exit()
