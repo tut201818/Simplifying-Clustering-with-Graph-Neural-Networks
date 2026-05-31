@@ -34,7 +34,7 @@ from sklearn.metrics.cluster import pair_confusion_matrix
 
 import sys
 
-from torch_geometric.datasets import WebKB
+from torch_geometric.datasets import WebKB, WikipediaNetwork, KarateClub
 
 
 #変更可能性のある個所は、隣接行列の正規化方法、活性化関数、
