@@ -57,14 +57,14 @@ torch.cuda.manual_seed(1)
 #data = dataset[0]
 
 #Wikipediaのページ間のネットワーク
-dataName = 'squirrel' #'chameleon','squirrel'
-dataset = WikipediaNetwork(root='data/Wikipedia',name= dataName)
-data = dataset[0]
+#dataName = 'squirrel' #'chameleon','squirrel'
+#dataset = WikipediaNetwork(root='data/Wikipedia',name= dataName)
+#data = dataset[0]
 
 #空手クラブの交友関係ネットワーク
-#dataset = KarateClub() 空手クラブは直入力
-#data = dataset[0]
-#dataName = 'KarateClub'
+dataset = KarateClub()
+data = dataset[0]
+dataName = 'KarateClub'
 
 #クラスタリング手法
 #JBGNN
