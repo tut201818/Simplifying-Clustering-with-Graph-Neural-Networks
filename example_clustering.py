@@ -57,7 +57,7 @@ torch.cuda.manual_seed(1)
 #data = dataset[0]
 
 #Wikipediaのページ間のネットワーク
-dataName = 'chameleon' #'chameleon','squirrel'
+dataName = 'squirrel' #'chameleon','squirrel'
 dataset = WikipediaNetwork(root='data/Wikipedia',name= dataName)
 data = dataset[0]
 
@@ -68,7 +68,7 @@ data = dataset[0]
 
 #クラスタリング手法
 #JBGNN
-jbgnn = 0
+jbgnn = 1
 #MinCutPool
 if jbgnn:
     minCut = 0
