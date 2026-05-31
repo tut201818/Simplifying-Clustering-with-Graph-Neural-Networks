@@ -68,7 +68,7 @@ dataName = 'KarateClub'
 
 #クラスタリング手法
 #JBGNN
-jbgnn = 0
+jbgnn = 1
 #MinCutPool
 if jbgnn:
     minCut = 0
