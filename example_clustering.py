@@ -34,6 +34,8 @@ from sklearn.metrics.cluster import pair_confusion_matrix
 
 import sys
 
+from torch_geometric.datasets import WebKB
+
 
 #変更可能性のある個所は、隣接行列の正規化方法、活性化関数、
 #変更する点は、MPレイヤーでGCNを使うかどうか、多層パーセプトロンでどの手法を使うか、
@@ -42,10 +44,17 @@ torch.manual_seed(1) # for (inconsistent) reproducibility
 torch.cuda.manual_seed(1)
 
 # Load dataset
-dataset = 'pubmed' #'cora', 'citeseer' or 'pubmed'
-path = osp.join(osp.dirname(osp.realpath(__file__)), '.', 'data', dataset)
-dataset = Planetoid(path, dataset, transform=T.NormalizeFeatures())
+#dataset = 'pubmed' #'cora', 'citeseer' or 'pubmed'
+#path = osp.join(osp.dirname(osp.realpath(__file__)), '.', 'data', dataset)
+#dataset = Planetoid(path, dataset, transform=T.NormalizeFeatures())
+#data = dataset[0]
+
+dataset = WebKB(
+    root='data/WebKB',
+    name='Wisconsin'
+)
 data = dataset[0]
+
 
 #隣接行列の正規化には最初はMinCutPoolで使われる簡素なものを採用したが、GCNと相性がいいのは元の方法の方なのではないかとも思ったので変えた
 
@@ -117,14 +126,14 @@ class Net(torch.nn.Module):
         # Cluster assignments (logits)
         s = self.mlp(x)
 
-        if 0:#JBGNN
+        if 1:#JBGNN
           # Compute loss
           adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
           _, _, b_loss = just_balance_pool(x, adj, s)
         
           return torch.softmax(s, dim=-1), b_loss
           
-        if 1:#MinCutPool
+        if 0:#MinCutPool
           # Compute loss
           adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
           _, _, mc_loss, o_loss = dense_mincut_pool(x, adj, s)
