@@ -43,22 +43,32 @@ from torch_geometric.datasets import WebKB
 torch.manual_seed(1) # for (inconsistent) reproducibility
 torch.cuda.manual_seed(1)
 
-# Load dataset
-#dataset = 'pubmed' #'cora', 'citeseer' or 'pubmed'
-#path = osp.join(osp.dirname(osp.realpath(__file__)), '.', 'data', dataset)
-#dataset = Planetoid(path, dataset, transform=T.NormalizeFeatures())
+# Load dataset choise:
+
+#引用ネットワーク
+#dataName = 'pubmed' #'cora', 'citeseer' or 'pubmed'
+#path = osp.join(osp.dirname(osp.realpath(__file__)), '.', 'data', dataName)
+#dataset = Planetoid(path, dataName, transform=T.NormalizeFeatures())
 #data = dataset[0]
 
-dataName = 'Cornell'
-dataset = WebKB(
-    root='data/WebKB',
-    name= dataName
-)
+#Webページのリンクのネットワーク
+#dataName = 'Cornell' #'Cornell','Texas','Wisconsin'
+#dataset = WebKB(root='data/WebKB',name= dataName)
+#data = dataset[0]
+
+#Wikipediaのページ間のネットワーク
+dataName = 'chameleon' #'chameleon','squirrel'
+dataset = WikipediaNetwork(root='data/Wikipedia',name= dataName)
 data = dataset[0]
+
+#空手クラブの交友関係ネットワーク
+#dataset = KarateClub() 空手クラブは直入力
+#data = dataset[0]
+#dataName = 'KarateClub'
 
 #クラスタリング手法
 #JBGNN
-jbgnn = 0
+jbgnn = 1
 #MinCutPool
 if jbgnn:
     minCut = 0
