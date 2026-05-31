@@ -68,7 +68,7 @@ data = dataset[0]
 
 #クラスタリング手法
 #JBGNN
-jbgnn = 1
+jbgnn = 0
 #MinCutPool
 if jbgnn:
     minCut = 0
