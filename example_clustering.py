@@ -63,7 +63,7 @@ jbgnn = 0
 if jbgnn:
     minCut = 0
 else:
-    mincut = 1
+    minCut = 1
 
 
 #隣接行列の正規化には最初はMinCutPoolで使われる簡素なものを採用したが、GCNと相性がいいのは元の方法の方なのではないかとも思ったので変えた
