@@ -42,7 +42,7 @@ torch.manual_seed(1) # for (inconsistent) reproducibility
 torch.cuda.manual_seed(1)
 
 # Load dataset
-dataset = 'cora' #'cora', 'citeseer' or 'pubmed'
+dataset = 'pubmed' #'cora', 'citeseer' or 'pubmed'
 path = osp.join(osp.dirname(osp.realpath(__file__)), '.', 'data', dataset)
 dataset = Planetoid(path, dataset, transform=T.NormalizeFeatures())
 data = dataset[0]
@@ -50,7 +50,7 @@ data = dataset[0]
 #隣接行列の正規化には最初はMinCutPoolで使われる簡素なものを採用したが、GCNと相性がいいのは元の方法の方なのではないかとも思ったので変えた
 
 #Compute connectivity matrix
-delta = 0.85
+delta = 0.80 #0.85
 edge_index, edge_weight = utils.get_laplacian(data.edge_index, data.edge_weight, normalization='sym')
 L = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
 A = torch.eye(data.num_nodes) - delta*L
@@ -117,14 +117,14 @@ class Net(torch.nn.Module):
         # Cluster assignments (logits)
         s = self.mlp(x)
 
-        if 1:#JBGNN
+        if 0:#JBGNN
           # Compute loss
           adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
           _, _, b_loss = just_balance_pool(x, adj, s)
         
           return torch.softmax(s, dim=-1), b_loss
           
-        if 0:#MinCutPool
+        if 1:#MinCutPool
           # Compute loss
           adj = utils.to_dense_adj(edge_index, edge_attr=edge_weight)
           _, _, mc_loss, o_loss = dense_mincut_pool(x, adj, s)
