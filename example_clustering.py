@@ -46,10 +46,10 @@ torch.cuda.manual_seed(1)
 # Load dataset choise:
 
 #引用ネットワーク
-#dataName = 'pubmed' #'cora', 'citeseer' or 'pubmed'
-#path = osp.join(osp.dirname(osp.realpath(__file__)), '.', 'data', dataName)
-#dataset = Planetoid(path, dataName, transform=T.NormalizeFeatures())
-#data = dataset[0]
+dataName = 'pubmed' #'cora', 'citeseer' or 'pubmed'
+path = osp.join(osp.dirname(osp.realpath(__file__)), '.', 'data', dataName)
+dataset = Planetoid(path, dataName, transform=T.NormalizeFeatures())
+data = dataset[0]
 
 #Webページのリンクのネットワーク
 #dataName = 'Cornell' #'Cornell','Texas','Wisconsin'
@@ -62,13 +62,13 @@ torch.cuda.manual_seed(1)
 #data = dataset[0]
 
 #空手クラブの交友関係ネットワーク
-dataset = KarateClub()
-data = dataset[0]
-dataName = 'KarateClub'
+#dataset = KarateClub()
+#data = dataset[0]
+#dataName = 'KarateClub'
 
 #クラスタリング手法
 #JBGNN
-jbgnn = 1
+jbgnn = 0
 #MinCutPool
 if jbgnn:
     minCut = 0
