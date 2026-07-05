@@ -405,7 +405,7 @@ if jbgnn:
 if minCut:
     print("clustering by MinCutPool")
 print(dataName)
-print(f'num_nodes:{G.number_of_nodes()},num_edges:{G.number_of_edges()},myu:{},true_num_clusters:{dataset.num_classes},mixing_parameter:{mu},average_degree:{average_degree}')
+print(f'num_nodes:{G.number_of_nodes()},num_edges:{G.number_of_edges()},true_num_clusters:{dataset.num_classes},mixing_parameter:{mu},average_degree:{average_degree}')
 
 
 sys.exit()
