@@ -26,7 +26,7 @@ from scipy.optimize import linear_sum_assignment
 from sklearn.metrics import f1_score
 
 import networkx as nx
-from torch_geometric.utils import to_networkx, to_dense_adj
+from torch_geometric.utils import to_networkx, from_networkx, to_dense_adj
 
 from torch_geometric.data import Data
 
@@ -46,10 +46,10 @@ torch.cuda.manual_seed(1)
 # Load dataset choise:
 
 #引用ネットワーク
-dataName = 'pubmed' #'cora', 'citeseer' or 'pubmed'
-path = osp.join(osp.dirname(osp.realpath(__file__)), '.', 'data', dataName)
-dataset = Planetoid(path, dataName, transform=T.NormalizeFeatures())
-data = dataset[0]
+#dataName = 'pubmed' #'cora', 'citeseer' or 'pubmed'
+#path = osp.join(osp.dirname(osp.realpath(__file__)), '.', 'data', dataName)
+#dataset = Planetoid(path, dataName, transform=T.NormalizeFeatures())
+#data = dataset[0]
 
 #Webページのリンクのネットワーク
 #dataName = 'Cornell' #'Cornell','Texas','Wisconsin'
@@ -66,9 +66,82 @@ data = dataset[0]
 #data = dataset[0]
 #dataName = 'KarateClub'
 
+#人口ネットワーク生成
+
+# ==========================
+# LFR Benchmark の生成
+# muは外部の辺/全辺
+# average_degreeによって変の数も変動する
+# min_comunityとmax_comunityの大きさとノード数の比によってある程度コミュニティ数を制御可能
+# ==========================
+num_nodes = 2708
+
+G = nx.LFR_benchmark_graph(
+    n=num_nodes,
+    tau1=2.5,
+    tau2=1.5,
+    mu=0.3,
+    average_degree=4,
+    max_degree=40,
+    min_community=250,
+    max_community=500,
+    seed=0
+)
+# ==========================
+# 真のコミュニティ取得
+# ==========================
+communities = {
+    frozenset(G.nodes[v]["community"])
+    for v in G.nodes()
+}
+
+labels = {}
+
+for cid, community in enumerate(communities):
+    for node in community:
+        labels[node] = cid
+
+num_clusters = len(communities)
+# ==========================
+# PyTorch Geometric形式へ変換
+# ==========================
+data = from_networkx(G)
+# ==========================
+# ノード特徴量生成
+# (同一コミュニティ内では少しだけ異なる)
+# ==========================
+feature_dim = 1433
+
+# 各コミュニティの中心ベクトル
+centers = torch.randint(
+    0, 2,
+    (num_clusters, feature_dim)
+).float()
+
+# ノイズの大きさ
+noise_std = 0.10
+
+x = torch.zeros(num_nodes, feature_dim)
+
+for node in range(num_nodes):
+    c = labels[node]
+    x[node] = centers[c] + noise_std * torch.randn(feature_dim)
+
+data.x = x
+# ==========================
+# 真のラベル
+# ==========================
+data.y = torch.tensor(
+    [labels[i] for i in range(num_nodes)],
+    dtype=torch.long
+)
+
+
+
+
 #クラスタリング手法
 #JBGNN
-jbgnn = 0
+jbgnn = 1
 #MinCutPool
 if jbgnn:
     minCut = 0
