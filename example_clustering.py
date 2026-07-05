@@ -68,12 +68,12 @@ torch.cuda.manual_seed(1)
 
 #人口ネットワーク生成
 
-# ==========================
-# LFR Benchmark の生成
+# ==================================================
+# LFR Benchmark生成
 # muは外部の辺/全辺
 # average_degreeによって変の数も変動する
 # min_comunityとmax_comunityの大きさとノード数の比によってある程度コミュニティ数を制御可能
-# ==========================
+# ==================================================
 num_nodes = 2708
 
 G = nx.LFR_benchmark_graph(
@@ -87,9 +87,9 @@ G = nx.LFR_benchmark_graph(
     max_community=500,
     seed=0
 )
-# ==========================
-# 真のコミュニティ取得
-# ==========================
+# ==================================================
+# コミュニティラベル取得
+# ==================================================
 communities = {
     frozenset(G.nodes[v]["community"])
     for v in G.nodes()
@@ -102,23 +102,22 @@ for cid, community in enumerate(communities):
         labels[node] = cid
 
 num_clusters = len(communities)
-# ==========================
-# PyTorch Geometric形式へ変換
-# ==========================
+# ==================================================
+# PyGへ変換
+# ==================================================
 data = from_networkx(G)
-# ==========================
-# ノード特徴量生成
-# (同一コミュニティ内では少しだけ異なる)
-# ==========================
+# ==================================================
+# 特徴量生成
+# feature_dimで特徴ベクトルの次元数を決定
+# noise_stdで同一クラスタ内の特徴ベクトルのばらつき具合を制御
+# ==================================================
 feature_dim = 1433
 
-# 各コミュニティの中心ベクトル
 centers = torch.randint(
     0, 2,
     (num_clusters, feature_dim)
 ).float()
 
-# ノイズの大きさ
 noise_std = 0.10
 
 x = torch.zeros(num_nodes, feature_dim)
@@ -128,16 +127,34 @@ for node in range(num_nodes):
     x[node] = centers[c] + noise_std * torch.randn(feature_dim)
 
 data.x = x
-# ==========================
-# 真のラベル
-# ==========================
+# ==================================================
+# ラベル
+# ==================================================
 data.y = torch.tensor(
     [labels[i] for i in range(num_nodes)],
     dtype=torch.long
 )
+# ==================================================
+# Planetoid互換Dataset
+# ==================================================
+class SyntheticDataset:
+    def __init__(self, data):
+        self.data = data
+        self.num_features = data.num_node_features
+        self.num_classes = int(data.y.max()) + 1
+
+    def __getitem__(self, idx):
+        if idx != 0:
+            raise IndexError
+        return self.data
+
+    def __len__(self):
+        return 1
 
 
-
+dataset = SyntheticDataset(data)
+data = dataset[0]
+# =============================================
 
 #クラスタリング手法
 #JBGNN
