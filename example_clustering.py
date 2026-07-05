@@ -42,11 +42,12 @@ import random
 #変更可能性のある個所は、隣接行列の正規化方法、活性化関数、
 #変更する点は、MPレイヤーでGCNを使うかどうか、多層パーセプトロンでどの手法を使うか、
 
-torch.manual_seed(1) # for (inconsistent) reproducibility
-torch.cuda.manual_seed(1)
+seed = 1
+torch.manual_seed(seed) # for (inconsistent) reproducibility
+torch.cuda.manual_seed(seed)
 
-random.seed(1)#特徴量生成を固定するために追加した
-np.random.seed(1)#
+random.seed(seed)#特徴量生成を固定するために追加した
+np.random.seed(seed)#
 
 # Load dataset choise:
 
@@ -95,7 +96,7 @@ G = nx.LFR_benchmark_graph(
     max_degree=int(num_nodes/20),
     min_community=int(0.8 * (num_nodes / target_clusters)),
     max_community=int(1.2 * (num_nodes / target_clusters)),
-    seed=0
+    seed=seed
 )
 # ==================================================
 # コミュニティラベル取得
