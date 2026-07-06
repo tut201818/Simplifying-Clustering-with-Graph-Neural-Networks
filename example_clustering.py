@@ -409,7 +409,6 @@ for epoch in range(1, 1001):#元は(1,1001)
     train_loss = train()
     nmi, acc, clust_types = test()
     #print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.4f}, ' f'ACC: {acc:.4f}, clust_types: {clust_types:.0f}')
-    print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.4f},clust_types: {clust_types:.0f}')
 
 
 model.eval()
@@ -421,8 +420,9 @@ if jbgnn:
     print("clustering by JBGNN")
 if minCut:
     print("clustering by MinCutPool")
-print(dataName)
-print(f'average_degree:{average_degree},num_nodes:{G.number_of_nodes()},num_edges:{G.number_of_edges()},true_num_clusters:{dataset.num_classes}')
+#print(dataName)
+#print(f'average_degree:{average_degree},num_nodes:{G.number_of_nodes()},num_edges:{G.number_of_edges()},true_num_clusters:{dataset.num_classes}')
+print(f'average_degree:{average_degree},num_nodes:{G.number_of_nodes()},NMI:{nmi:.4f}')
 
 
 sys.exit()
