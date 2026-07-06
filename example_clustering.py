@@ -2,11 +2,11 @@
 #シード値は0,1,,,
 seed = 2
 #平均次数　初期値は４
-average_degree = 4
+average_degree = 6
 #ノード数　初期値は
 num_nodes = 1000
 #クラスタリング手法 JBGNNなら1,MinCutPoolなら0
-jbgnn = 1
+jbgnn = 0
 #======
 
 import os.path as osp
