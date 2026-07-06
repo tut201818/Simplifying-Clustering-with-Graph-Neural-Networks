@@ -1,10 +1,10 @@
 #=======
 #シード値は0,1,,,
-seed = 1
+seed = 0
 #平均次数　初期値は４
-average_degree = 2
+average_degree = 4
 #ノード数　初期値は
-num_nodes = 1000
+num_nodes = 500
 #クラスタリング手法 JBGNNなら1,MinCutPoolなら0
 jbgnn = 0
 #======
