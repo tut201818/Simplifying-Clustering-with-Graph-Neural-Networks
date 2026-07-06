@@ -1,3 +1,14 @@
+#=======
+#シード値は0,1,,,
+seed = 7
+#平均次数　初期値は４
+average_degree = 6
+#ノード数　初期値は
+num_nodes = 1000 
+#クラスタリング手法 JBGNNなら1,MinCutPoolなら0
+jbgnn = 1
+#======
+
 import os.path as osp
 import torch
 
@@ -37,17 +48,6 @@ import sys
 from torch_geometric.datasets import WebKB, WikipediaNetwork, KarateClub
 
 import random
-
-#=======
-#シード値は0,1,,,
-seed = 0
-#平均次数　初期値は４
-average_degree = 4
-#ノード数　初期値は
-num_nodes = 1000 
-#クラスタリング手法 JBGNNなら1,MinCutPoolなら0
-jbgnn = 1
-#======
 
 
 #seed = 1
