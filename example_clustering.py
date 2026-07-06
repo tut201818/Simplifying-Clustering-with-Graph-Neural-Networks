@@ -408,20 +408,21 @@ def clustering_full_scores(y_pred, y_true, edge_index, num_nodes):
 for epoch in range(1, 1001):#元は(1,1001)
     train_loss = train()
     nmi, acc, clust_types = test()
-    print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.4f}, ' f'ACC: {acc:.4f}, clust_types: {clust_types:.0f}')
+    #print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.4f}, ' f'ACC: {acc:.4f}, clust_types: {clust_types:.0f}')
+    print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.4f},clust_types: {clust_types:.0f}')
 
 
 model.eval()
 clust, _ = model(data.x, data.edge_index, data.edge_weight)
 f1_score,mod,conductance = clustering_full_scores(clust.max(1)[1].cpu(), data.y.cpu(),data.edge_index, data.num_nodes)
 f1_score = float(f1_score)
-print(f'F1_score: {f1_score:.4f}, Modularity: {mod:.4f}, Conductance: {conductance:.4f}')
+#print(f'F1_score: {f1_score:.4f}, Modularity: {mod:.4f}, Conductance: {conductance:.4f}')
 if jbgnn:
     print("clustering by JBGNN")
 if minCut:
     print("clustering by MinCutPool")
 print(dataName)
-print(f'num_nodes:{G.number_of_nodes()},num_edges:{G.number_of_edges()},true_num_clusters:{dataset.num_classes},mixing_parameter:{mu},average_degree:{average_degree}')
+print(f'average_degree:{average_degree},num_nodes:{G.number_of_nodes()},num_edges:{G.number_of_edges()},true_num_clusters:{dataset.num_classes}')
 
 
 sys.exit()
