@@ -40,7 +40,7 @@ import random
 
 #=======
 #シード値は0,1,,,
-seed = 2
+seed = 1
 #平均次数　初期値は４
 average_degree = 4
 #ノード数　初期値は
