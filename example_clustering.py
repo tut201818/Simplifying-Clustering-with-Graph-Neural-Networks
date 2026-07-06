@@ -40,9 +40,9 @@ import random
 
 #=======
 #シード値は0,1,,,
-seed = 2
+seed = 3
 #平均次数　初期値は４
-average_degree = 6
+average_degree = 2
 #ノード数　初期値は
 num_nodes = 1000 
 #クラスタリング手法 JBGNNなら1,MinCutPoolなら0
