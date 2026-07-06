@@ -422,7 +422,7 @@ if minCut:
     print("clustering by MinCutPool")
 #print(dataName)
 #print(f'average_degree:{average_degree},num_nodes:{G.number_of_nodes()},num_edges:{G.number_of_edges()},true_num_clusters:{dataset.num_classes}')
-print(f'average_degree:{average_degree},num_nodes:{G.number_of_nodes()},NMI:{nmi:.4f}')
+print(f'average_degree:{average_degree},num_nodes:{G.number_of_nodes()},NMI:{nmi:.4f},seed:{seed}')
 
 
 sys.exit()
