@@ -12,7 +12,7 @@ else:
 #シード値は0,1,,,
 seed = 0
 #平均次数　初期値は４
-average_degree = 4
+average_degree = 3
 #ノード数　初期値は
 num_nodes = 100
 #=========================
@@ -62,7 +62,7 @@ import random
 
 #データ生成用のシード値
 random.seed(seed)#特徴量生成を固定するために追加した
-np.random.seed(seed)#
+np.random.seed(seed)
 # ==================================================
 # LFR Benchmark生成
 # muは外部の辺/全辺
@@ -80,8 +80,8 @@ G = nx.LFR_benchmark_graph(
     n=num_nodes,
     tau1=2.5,
     tau2=1.5,
-    mu=mu,
-    average_degree=average_degree,
+    mu = mu,
+    average_degree = average_degree,
     max_degree=int(num_nodes/20),
     min_community=int(0.8 * (num_nodes / target_clusters)),
     max_community=int(1.2 * (num_nodes / target_clusters)),
