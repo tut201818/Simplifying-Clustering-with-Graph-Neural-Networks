@@ -1,13 +1,21 @@
-#=======
-#シード値は0,1,,,
-seed = 8
-#平均次数　初期値は４
-average_degree = 6
-#ノード数　初期値は
-num_nodes = 1000
+#==========================
+#クラスタリング設定
+cycles = 5
 #クラスタリング手法 JBGNNなら1,MinCutPoolなら0
 jbgnn = 0
-#======
+if jbgnn:
+    minCut = 0
+else:
+    minCut = 1
+#==========================
+#生成データのパラメータ設定
+#シード値は0,1,,,
+seed = 0
+#平均次数　初期値は４
+average_degree = 4
+#ノード数　初期値は
+num_nodes = 100
+#=========================
 
 import os.path as osp
 import torch
@@ -50,38 +58,11 @@ from torch_geometric.datasets import WebKB, WikipediaNetwork, KarateClub
 import random
 
 
-#seed = 1
-torch.manual_seed(seed) # for (inconsistent) reproducibility
-torch.cuda.manual_seed(seed)
+#人工ネットワーク生成
 
+#データ生成用のシード値
 random.seed(seed)#特徴量生成を固定するために追加した
 np.random.seed(seed)#
-
-# Load dataset choise:
-
-#引用ネットワーク
-#dataName = 'pubmed' #'cora', 'citeseer' or 'pubmed'
-#path = osp.join(osp.dirname(osp.realpath(__file__)), '.', 'data', dataName)
-#dataset = Planetoid(path, dataName, transform=T.NormalizeFeatures())
-#data = dataset[0]
-
-#Webページのリンクのネットワーク
-#dataName = 'Cornell' #'Cornell','Texas','Wisconsin'
-#dataset = WebKB(root='data/WebKB',name= dataName)
-#data = dataset[0]
-
-#Wikipediaのページ間のネットワーク
-#dataName = 'squirrel' #'chameleon','squirrel'
-#dataset = WikipediaNetwork(root='data/Wikipedia',name= dataName)
-#data = dataset[0]
-
-#空手クラブの交友関係ネットワーク
-#dataset = KarateClub()
-#data = dataset[0]
-#dataName = 'KarateClub'
-
-#人口ネットワーク生成
-
 # ==================================================
 # LFR Benchmark生成
 # muは外部の辺/全辺
@@ -170,19 +151,33 @@ class SyntheticDataset:
     def __len__(self):
         return 1
 
-
 dataset = SyntheticDataset(data)
 data = dataset[0]
 # =============================================
 
-#クラスタリング手法
-#JBGNN
-#jbgnn = 1
-#MinCutPool
-if jbgnn:
-    minCut = 0
-else:
-    minCut = 1
+
+# Load dataset choise:
+
+#引用ネットワーク
+#dataName = 'cora' #'cora', 'citeseer' or 'pubmed'
+#path = osp.join(osp.dirname(osp.realpath(__file__)), '.', 'data', dataName)
+#dataset = Planetoid(path, dataName, transform=T.NormalizeFeatures())
+#data = dataset[0]
+
+#Webページのリンクのネットワーク
+#dataName = 'Cornell' #'Cornell','Texas','Wisconsin'
+#dataset = WebKB(root='data/WebKB',name= dataName)
+#data = dataset[0]
+
+#Wikipediaのページ間のネットワーク
+#dataName = 'squirrel' #'chameleon','squirrel'
+#dataset = WikipediaNetwork(root='data/Wikipedia',name= dataName)
+#data = dataset[0]
+
+#空手クラブの交友関係ネットワーク
+dataset = KarateClub()
+data = dataset[0]
+dataName = 'KarateClub'
 
 
 #隣接行列の正規化には最初はMinCutPoolで使われる簡素なものを採用したが、GCNと相性がいいのは元の方法の方なのではないかとも思ったので変えた
@@ -198,7 +193,6 @@ data.edge_index, data.edge_weight = utils.dense_to_sparse(A)
 #data.edge_index, data.edge_weight = gcn_norm(  
 #               data.edge_index, data.edge_weight, data.num_nodes,
 #               add_self_loops=False, dtype=data.x.dtype)
-
 
 
 class Net(torch.nn.Module):
@@ -283,14 +277,7 @@ class Net(torch.nn.Module):
           total_loss = mo_loss + co_loss
       
           return torch.softmax(s, dim=-1), total_loss
-        
 
-
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-data = data.to(device)
-#MinCutPoolのサンプルでは活性化関数にELUを使用している
-model = Net([64]*10, "ReLU", dataset.num_features, dataset.num_classes, [16], "ReLU").to(device)
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
 def train():
     model.train()
@@ -404,25 +391,39 @@ def clustering_full_scores(y_pred, y_true, edge_index, num_nodes):
     # -----------------------------
     return float(f1_score),mod,conductance
 
+
+#複数回クラスタリングを行う
+for i in range(cycles):
     
-for epoch in range(1, 1001):#元は(1,1001)
-    train_loss = train()
-    nmi, acc, clust_types = test()
-    #print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.4f}, ' f'ACC: {acc:.4f}, clust_types: {clust_types:.0f}')
+    #クラスタリング用のシード値
+    torch.manual_seed(i) # for (inconsistent) reproducibility
+    torch.cuda.manual_seed(i)
+
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    data = data.to(device)
+    #MinCutPoolのサンプルでは活性化関数にELUを使用している
+    model = Net([64]*10, "ReLU", dataset.num_features, dataset.num_classes, [16], "ReLU").to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+    
+    for epoch in range(1, 1001):#元は(1,1001)
+        train_loss = train()
+        nmi, acc, clust_types = test()
+        #print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.4f}, ' f'ACC: {acc:.4f}, clust_types: {clust_types:.0f}')
 
 
-model.eval()
-clust, _ = model(data.x, data.edge_index, data.edge_weight)
-f1_score,mod,conductance = clustering_full_scores(clust.max(1)[1].cpu(), data.y.cpu(),data.edge_index, data.num_nodes)
-f1_score = float(f1_score)
-#print(f'F1_score: {f1_score:.4f}, Modularity: {mod:.4f}, Conductance: {conductance:.4f}')
-if jbgnn:
-    print("clustering by JBGNN")
-if minCut:
-    print("clustering by MinCutPool")
-#print(dataName)
-#print(f'average_degree:{average_degree},num_nodes:{G.number_of_nodes()},num_edges:{G.number_of_edges()},true_num_clusters:{dataset.num_classes}')
-print(f'average_degree:{average_degree},num_nodes:{G.number_of_nodes()},NMI:{nmi:.4f},seed:{seed}')
+    model.eval()
+    clust, _ = model(data.x, data.edge_index, data.edge_weight)
+    f1_score,mod,conductance = clustering_full_scores(clust.max(1)[1].cpu(), data.y.cpu(),data.edge_index, data.num_nodes)
+    f1_score = float(f1_score)
+    #print(f'F1_score: {f1_score:.4f}, Modularity: {mod:.4f}, Conductance: {conductance:.4f}')
+    if jbgnn:
+        print("clustering by JBGNN")
+    if minCut:
+        print("clustering by MinCutPool")
+    print(dataName)
+    print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.4f}, clust_types: {clust_types:.0f}')
+    #print(f'average_degree:{average_degree},num_nodes:{G.number_of_nodes()},num_edges:{G.number_of_edges()},true_num_clusters:{dataset.num_classes}')
+    #print(f'average_degree:{average_degree},num_nodes:{G.number_of_nodes()},NMI:{nmi:.4f},seed:{seed}')
 
 
 sys.exit()
