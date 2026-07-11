@@ -1,6 +1,6 @@
 #==========================
 #クラスタリング設定
-cycles = 5
+cycles = 3
 #クラスタリング手法 JBGNNなら1,MinCutPoolなら0
 jbgnn = 0
 if jbgnn:
@@ -395,7 +395,6 @@ def clustering_full_scores(y_pred, y_true, edge_index, num_nodes):
 #複数回クラスタリングを行う
 for i in range(cycles):
 
-    print('cycle:{i}')
     #クラスタリング用のシード値
     torch.manual_seed(i) # for (inconsistent) reproducibility
     torch.cuda.manual_seed(i)
@@ -417,14 +416,14 @@ for i in range(cycles):
     f1_score,mod,conductance = clustering_full_scores(clust.max(1)[1].cpu(), data.y.cpu(),data.edge_index, data.num_nodes)
     f1_score = float(f1_score)
     #print(f'F1_score: {f1_score:.4f}, Modularity: {mod:.4f}, Conductance: {conductance:.4f}')
-    if jbgnn:
-        print("clustering by JBGNN")
-    if minCut:
-        print("clustering by MinCutPool")
-    print(dataName)
     print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, ' f'NMI: {nmi:.4f}, clust_types: {clust_types:.0f}')
     #print(f'average_degree:{average_degree},num_nodes:{G.number_of_nodes()},num_edges:{G.number_of_edges()},true_num_clusters:{dataset.num_classes}')
     #print(f'average_degree:{average_degree},num_nodes:{G.number_of_nodes()},NMI:{nmi:.4f},seed:{seed}')
 
+print(dataName)
+if jbgnn:
+        print("clustering by JBGNN")
+    if minCut:
+        print("clustering by MinCutPool")
 
 sys.exit()
