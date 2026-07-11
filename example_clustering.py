@@ -159,10 +159,10 @@ data = dataset[0]
 # Load dataset choise:
 
 #引用ネットワーク
-#dataName = 'cora' #'cora', 'citeseer' or 'pubmed'
-#path = osp.join(osp.dirname(osp.realpath(__file__)), '.', 'data', dataName)
-#dataset = Planetoid(path, dataName, transform=T.NormalizeFeatures())
-#data = dataset[0]
+dataName = 'pubmed' #'cora', 'citeseer' or 'pubmed'
+path = osp.join(osp.dirname(osp.realpath(__file__)), '.', 'data', dataName)
+dataset = Planetoid(path, dataName, transform=T.NormalizeFeatures())
+data = dataset[0]
 
 #Webページのリンクのネットワーク
 #dataName = 'Cornell' #'Cornell','Texas','Wisconsin'
@@ -175,9 +175,9 @@ data = dataset[0]
 #data = dataset[0]
 
 #空手クラブの交友関係ネットワーク
-dataset = KarateClub()
-data = dataset[0]
-dataName = 'KarateClub'
+#dataset = KarateClub()
+#data = dataset[0]
+#dataName = 'KarateClub'
 
 
 #隣接行列の正規化には最初はMinCutPoolで使われる簡素なものを採用したが、GCNと相性がいいのは元の方法の方なのではないかとも思ったので変えた
