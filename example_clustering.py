@@ -394,7 +394,8 @@ def clustering_full_scores(y_pred, y_true, edge_index, num_nodes):
 
 #複数回クラスタリングを行う
 for i in range(cycles):
-    
+
+    print('cycle:{i}')
     #クラスタリング用のシード値
     torch.manual_seed(i) # for (inconsistent) reproducibility
     torch.cuda.manual_seed(i)
