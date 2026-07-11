@@ -422,8 +422,8 @@ for i in range(cycles):
 
 print(dataName)
 if jbgnn:
-        print("clustering by JBGNN")
-    if minCut:
-        print("clustering by MinCutPool")
+    print("clustering by JBGNN")
+if minCut:
+    print("clustering by MinCutPool")
 
 sys.exit()
