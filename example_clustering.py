@@ -396,8 +396,8 @@ def clustering_full_scores(y_pred, y_true, edge_index, num_nodes):
 for i in range(cycles):
 
     #クラスタリング用のシード値
-    torch.manual_seed(i) # for (inconsistent) reproducibility
-    torch.cuda.manual_seed(i)
+    torch.manual_seed(3) # for (inconsistent) reproducibility
+    torch.cuda.manual_seed(3)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     data = data.to(device)
